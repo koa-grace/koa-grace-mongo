@@ -1,0 +1,25 @@
+{
+  "name": "koa-grace-mongo",
+  "version": "1.0.6",
+  "description": "KOA-grace连接数据库的中间件",
+  "main": "index.js",
+  "scripts": {
+    "test": "DEBUG=* node --harmony ./example/app"
+  },
+  "keywords": [
+    "koa",
+    "mongo",
+    "grace-mongo"
+  ],
+  "dependencies": {
+    "koa": "*",
+    "mongoose": "^4.4.3"
+  },
+  "devDependencies": {
+    "debug": "^2.2.0",
+    "koa-grace-router": "^1.0.9"
+  },
+  "author": "wilee",
+  "license": "MIT",
+  "repository": "https://github.com/koa-grace/koa-grace-mongo.git"
+}
