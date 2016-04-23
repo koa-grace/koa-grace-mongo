@@ -1,6 +1,6 @@
 {
   "name": "koa-grace-mongo",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "KOA-grace连接数据库的中间件",
   "main": "index.js",
   "scripts": {

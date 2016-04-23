@@ -91,6 +91,11 @@ function mongo(app, options) {
       * @return {Object} 返回一个Entity对象
       */
       mongo: function (mod, data){
+        if (!Model || !Model[mod]) {
+          debug("can't find model : " + mod);
+          return;
+        }
+
         return (new Model[mod](data));
       },
       /**
