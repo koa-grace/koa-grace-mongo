@@ -52,17 +52,24 @@ function mongo(app, options) {
   const root = options.root;
   const connect = options.connect;
 
+  // 如果root不存在则直接跳过
+  if (!fs.existsSync(root)) {
+    debug('error : can\'t find mongo path ' + root);
+    return function* ctrl(next) { yield next; };
+  }
+
   // 创建数据库连接
   let db = mongoose.createConnection(connect);
 
-  db.on('error', function(err){
+  db.on('error', function(err) {
     debug(`error: connect ${connect} ${err}`);
   });
   db.once('open', function() {
     debug(`connect ${connect} success!`);
   });
 
-  let Schema = {},Model = {};
+  let Schema = {},
+    Model = {};
   _ls(root).forEach(function(filePath) {
     if (!/.js$/.test(filePath)) {
       return;
@@ -71,26 +78,26 @@ function mongo(app, options) {
     let mod = require(filePath);
 
     // 创建schema
-    let _schema = new mongoose.Schema(mod.schema[0],mod.schema[1]);
+    let _schema = new mongoose.Schema(mod.schema[0], mod.schema[1]);
     _schema.methods = mod.methods;
 
     // 发布为Model
     let _model = db.model(mod.model, _schema);
 
     Schema[mod.model] = _schema;
-    Model[mod.model]  = _model;
+    Model[mod.model] = _model;
   });
 
   return function* ctrl(next) {
     if (this.mongo) return yield next
 
-   
+
     Object.assign(this, {
       /**
-      * mongo
-      * @return {Object} 返回一个Entity对象
-      */
-      mongo: function (mod, data){
+       * mongo
+       * @return {Object} 返回一个Entity对象
+       */
+      mongo: function(mod, data) {
         if (!Model || !Model[mod]) {
           debug("can't find model : " + mod);
           return;
@@ -99,13 +106,13 @@ function mongo(app, options) {
         return (new Model[mod](data));
       },
       /**
-      * mongoMap
-      * @param {Array} list mongo请求列表
-         *        {Object}    list[].model 模型
-         *        {Array}     list[].arg 参数
-         *        {Function}  list[].fun 模型方法
-      */
-      mongoMap: function* (list){
+       * mongoMap
+       * @param {Array} list mongo请求列表
+       *        {Object}    list[].model 模型
+       *        {Array}     list[].arg 参数
+       *        {Function}  list[].fun 模型方法
+       */
+      mongoMap: function*(list) {
         /**
          * _Mongo
          * @param {Object} opt 配置项
@@ -113,17 +120,17 @@ function mongo(app, options) {
          *        {Array}  opt.arg 参数
          *        {Function}  opt.fun 模型方法
          */
-        function* _Mongo(opt){
+        function* _Mongo(opt) {
           let arg = opt.arg || [];
           let model = opt.model;
           let fun = opt.fun;
           let res = yield fun.apply(model, arg);
-          
+
           return res;
         }
 
         let result = yield list.map(_Mongo);
-        
+
         return result;
       }
     })
